@@ -40,9 +40,11 @@ shinyUI(fluidPage(
                          
                          tags$hr(),
                          tags$h4("GCP Virtual Machine Console"),
-                         tags$a(href="https://console.cloud.google.com/compute/instances?authuser=0&project=bid4birds-337119", "GCP VMs", target="_blank")
-                         
-                         
+                         tags$a(href="https://console.cloud.google.com/compute/instances?authuser=0&project=bid4birds-337119", "GCP VMs", target="_blank"),
+                         tags$br(),
+                         tags$br(),
+                         actionButton("show_running_ce", "Show Running Bids"),
+                         tableOutput("current_running_bids")
                      ),
                      
                      # Show a plot of the generated distribution

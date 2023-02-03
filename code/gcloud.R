@@ -2,6 +2,7 @@ b4b_deploy_gce <- function(instance_name, data_bucket, auction_id,
                            shapefile, split_col, gb, months, waterfiles, output_bucket) {
     
     gs_bucket <- glue::glue("gs://{data_bucket}")
+    gs_output_bucket <- glue::glue("gs://{output_bucket}")
     
     gce_res <- system2("gcloud", 
                        args = c(
@@ -16,7 +17,7 @@ b4b_deploy_gce <- function(instance_name, data_bucket, auction_id,
                            "--maintenance-policy=MIGRATE",
                            "--provisioning-model=STANDARD",
                            "--service-account=964299681615-compute@developer.gserviceaccount.com",
-                           "--scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append",
+                           "--scopes=https://www.googleapis.com/auth/cloud-platform",
                            "--image=projects/cos-cloud/global/images/cos-stable-101-17162-40-56",
                            "--boot-disk-size=50GB",
                            "--boot-disk-type=pd-balanced",
@@ -30,7 +31,7 @@ b4b_deploy_gce <- function(instance_name, data_bucket, auction_id,
                            glue::glue("--container-arg={gb}"),
                            glue::glue("--container-arg={months}"),
                            glue::glue("--container-arg={waterfiles}"),
-                           glue::glue("--container-arg={output_bucket}"),
+                           glue::glue("--container-arg={gs_output_bucket}"),
                            "--no-shielded-secure-boot",
                            "--shielded-vtpm",
                            "--shielded-integrity-monitoring",
@@ -57,7 +58,7 @@ b4b_get_logs_for_instance <- function(instance_name, limit=10) {
     instance_id <- b4b_gce_get_instance_id(instance_name)
     
     resp <- system2(command = "gcloud", 
-            args = glue::glue("logging read \"resource.type=gce_instance AND logName=projects/bid4birds-337119/logs/cos_containers AND resource.labels.instance_id={instance_id}\" --limit 10 --format=\"json\" "), 
+            args = glue::glue("logging read \"resource.type=gce_instance AND logName=projects/bid4birds-337119/logs/cos_containers AND resource.labels.instance_id={instance_id}\" --limit 20 --format=\"json\" "), 
             stdout = TRUE)
     
     json_res <- jsonlite::parse_json(resp)
@@ -103,9 +104,11 @@ b4b_gce_list <- function() {
     resp <- jsonlite::parse_json(gce_res)
     
     purrr::map_df(resp, function(x) {
+        run_time <- difftime(lubridate::now("UTC"), lubridate::as_datetime(x$creationTimestamp), units = "mins")
         tibble::tibble(
-            name = x$name, 
-            status = x$status
+            `bid name` = x$name, 
+            status = x$status, 
+            `runtime (mins)` = round(run_time)
         )
     })
     
