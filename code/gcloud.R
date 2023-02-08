@@ -113,3 +113,13 @@ b4b_gce_list <- function() {
     })
     
 }
+
+b4b_check_creds <- function() {
+    resp <- system2("gcloud", 
+                    args = c("auth list --format=\"json\""), 
+                    stdout = TRUE)
+    
+    json_resp <- jsonlite::parse_json(resp)
+    
+    return(list(account = json_resp[[1]]$account, status = json_resp[[1]]$status))
+}

@@ -31,4 +31,8 @@ shinyServer(function(input, output) {
             b4b_gce_list()
         })
     })
+    
+    observeEvent(input$check_gcp_creds, {
+        output$creds_resp_table <- renderTable(tibble::as_tibble(b4b_check_creds()))
+    })
 })

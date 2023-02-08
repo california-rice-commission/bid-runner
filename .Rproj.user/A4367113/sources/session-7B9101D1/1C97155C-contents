@@ -1,8 +1,0 @@
-b4b_deploy_gce("testing1", 
-               data_bucket = "gs://bid4birds-bucket/auction_2022_fall", 
-               auction_id = "auction_2022_spring", 
-               shapefile = "b4b-4-fields.shp", 
-               split_col = "Splt_ID", 
-               gb = 8)
-
-b4b_gce_list()

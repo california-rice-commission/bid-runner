@@ -24,7 +24,13 @@ shinyUI(fluidPage(
                          tags$hr(),
                          
                          textInput("b4b_output_bucket", "Enter bucket for output"), 
-                         actionButton("b4b_run_bid", "Run Bid", icon = icon("rocket"), class = "btn-success")
+                         actionButton("b4b_run_bid", "Run Bid", icon = icon("rocket"), class = "btn-success"), 
+                         
+                         tags$hr(),
+                         tags$br(),
+                         tags$p("Test credentials to verify connection to GCloud is active"),
+                         actionButton("check_gcp_creds", "Check Credentials"),
+                         tableOutput("creds_resp_table")
                      ),
                      
                      # Show a plot of the generated distribution
