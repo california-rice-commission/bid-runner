@@ -1,15 +1,17 @@
 @echo off 
 
-FOR /F "tokens=* USEBACKQ" %%F IN (`Rscript --version`) DO (
-SET var=%%F
-)
+pushd C:\Program Files
+for /f "delims=" %%F in ('dir /s /b R.exe') do set "Rpath=%%F"
+popd
 
-SET R_VERSION_DETECTED=%var:~20,5%
+echo %Rpath%
 
-SET PART1="C:/Program Files/R/R-
-SET PART2=/bin/x64/R.exe" -e "shiny::runApp('.', launch.browser = TRUE)"
+SET PART2=" -e "shiny::runApp('.', launch.browser = TRUE)"
 
-SET run_cmd=%PART1%%R_VERSION_DETECTED%%PART2%
+SET run_cmd="%Rpath%%PART2%
+
+echo %run_cmd%
 
 %run_cmd%
 
+pause
